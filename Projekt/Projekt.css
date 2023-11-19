@@ -1,0 +1,23 @@
+
+
+/*algemeine Eigenschaften des Headers*/
+#header h1 {
+    font-size: 300%;
+    background-color: green;
+    height: 10%;
+    padding: 15px;
+    margin: unset;
+    font-family: sans-serif;
+    text-align: center;
+}
+
+
+/*algemeines aussehen des Bodys*/
+body {
+    font-family: sans-serif;
+    font-size: 150%;
+}
+/*aussehen des Impressums*/
+div#impressum {
+    background-color: green;
+}
