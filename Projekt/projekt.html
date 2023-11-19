@@ -48,7 +48,250 @@
 
   <div id="todoList"></div>
 
-  
+  <script>
+    // Array to store TODOs
+    let todos = [];
+
+    // Function to add a new TODO
+    function addTodo() {
+      const title = document.getElementById('title').value;
+      const description = document.getElementById('description').value;
+      const abbreviation = document.getElementById('abbreviation').value;
+      const important = document.getElementById('important').checked;
+      const urgent = document.getElementById('urgent').checked;
+      const endDate = document.getElementById('endDate').value;
+    
+      const todo = {
+        title,
+        description,
+        abbreviation,
+        important,
+        urgent,
+        endDate,
+        completed: 0
+      };
+
+      todos.push(todo);
+      renderTodos();
+      document.getElementById('todoForm').reset();
+    }
+
+    // Function to render TODOs
+    function renderTodos() {
+      const todoList = document.getElementById('todoList');
+      todoList.innerHTML = '';
+      // render todos
+      todos.forEach((todo, index) => {
+        const todoItem = document.createElement('div');
+        todoItem.classList.add('todo-item');
+        // add title
+        const todoTitle = document.createElement('h2');
+        todoTitle.textContent = todo.title;
+        todoItem.appendChild(todoTitle);
+        // add description
+        const todoDescription = document.createElement('p');
+        todoDescription.textContent = todo.description;
+        todoItem.appendChild(todoDescription);
+        // add abbreviation
+        const todoAbbreviation = document.createElement('p');
+        todoAbbreviation.textContent = `Kürzel: ${todo.abbreviation}`;
+        todoItem.appendChild(todoAbbreviation);
+        // add priority
+        const priority = calculatePriority(todo);
+        const todoPriority = document.createElement('p');
+        todoPriority.textContent = `Priorität: ${priority}`;
+        todoItem.appendChild(todoPriority);
+        // add end date
+        const endDate = document.createElement('p');
+        endDate.textContent = `Abgeschlossen bis: ${todo.endDate}`;
+        todoItem.appendChild(endDate);
+        // add progress
+        const completedPercentage = calculateCompletedPercentage(todo);
+        const todoProgress = document.createElement('p');
+        todoProgress.textContent = `Fortschritt: ${completedPercentage}%`;
+        todoItem.appendChild(todoProgress);
+
+        const progressLabel = document.createElement('label');
+        progressLabel.setAttribute('for', `progress${index}`);
+        progressLabel.textContent = 'Fortschritt:';
+        // add progress input
+        const progressInput = document.createElement('input');
+        progressInput.setAttribute('type', 'range');
+        progressInput.setAttribute('id', `progress${index}`);
+        progressInput.setAttribute('min', '0');
+        progressInput.setAttribute('max', '100');
+        progressInput.setAttribute('value', completedPercentage);
+        progressInput.addEventListener('input', function () {
+          updateProgress(index, progressInput.value);
+        });
+
+        const progressValue = document.createElement('span');
+        progressValue.textContent = `${completedPercentage}%`;
+
+        const progressContainer = document.createElement('div');
+        progressContainer.classList.add('progress-container');
+        progressContainer.appendChild(progressLabel);
+        progressContainer.appendChild(progressInput);
+        progressContainer.appendChild(progressValue);
+        todoItem.appendChild(progressContainer);
+        // add modify button
+        const modifyButton = document.createElement('button');
+        modifyButton.textContent = 'Verändern';
+        modifyButton.addEventListener('click', function () {
+          modifyTodo(index);
+        });
+        todoItem.appendChild(modifyButton);
+        // add delete button
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Löschen';
+        deleteButton.addEventListener('click', function () {
+          deleteTodo(index);
+        });
+        todoItem.appendChild(deleteButton);
+
+        todoList.appendChild(todoItem);
+      });
+    }
+
+    // Function to calculate the priority of a TODO
+    function calculatePriority(todo) {
+      if (todo.important && todo.urgent) {
+        return 'Sofort erledigen';
+      } else if (todo.important && !todo.urgent) {
+        return 'Einplanen und Wohlfühlen';
+      } else if (!todo.important && todo.urgent) {
+        return 'Gib es ab';
+      } else {
+        return 'Weg damit';
+      }
+    }
+
+    // Function to calculate the percentage of completed TODO
+    function calculateCompletedPercentage(todo) {
+      // calculate percentage
+      return todo.completed;
+    }
+
+    // Function to update the progress of a TODO
+    function updateProgress(index, value) {
+      todos[index].completed = parseInt(value);
+      renderTodos();
+    }
+
+    // Function to modify a TODO
+    function modifyTodo(index) {
+      const todo = todos[index];
+      const newTitle = prompt('Neuen Titel hier eingben:', todo.title);
+      const newDescription = prompt('Neue Beschreibung hier Eingeben:', todo.description);
+      const newAbbreviation = prompt('Neues Kürzel hier Eingeben:', todo.abbreviation);
+      const newImportant = confirm('Ist es wichtig? ja = ok, nein = abbrechen');
+      const newUrgent = confirm('Ist es dringend? ja = ok, nein = abbrechen');
+      const newEndDate = prompt('Neues Abgeschlossen bis Datum hier Eingeben:', todo.endDate);
+      // update todo
+      todos[index] = {
+        title: newTitle,
+        description: newDescription,
+        abbreviation: newAbbreviation,
+        important: newImportant,
+        urgent: newUrgent,
+        endDate: newEndDate,
+        completed: todo.completed
+      };
+      // render todos
+      renderTodos();
+    }
+
+    // Function to delete a TODO
+    function deleteTodo(index) {
+      todos.splice(index, 1);
+      renderTodos();
+    }
+
+    // Function to search for TODOs
+    function search() {
+      const searchInput = document.getElementById('searchInput').value.toLowerCase();
+      const filteredTodos = todos.filter(todo =>
+        todo.title.toLowerCase().includes(searchInput) ||
+        todo.abbreviation.toLowerCase().includes(searchInput)
+      );
+      renderFilteredTodos(filteredTodos);
+    }
+
+    // Function to render filtered TODOs
+    function renderFilteredTodos(filteredTodos) {
+      const todoList = document.getElementById('todoList');
+      todoList.innerHTML = '';
+      // render filtered todos
+      filteredTodos.forEach((todo, index) => {
+        const todoItem = document.createElement('div');
+        todoItem.classList.add('todo-item');
+        // add title
+        const todoTitle = document.createElement('h2');
+        todoTitle.textContent = todo.title;
+        todoItem.appendChild(todoTitle);
+        // add description
+        const todoDescription = document.createElement('p');
+        todoDescription.textContent = todo.description;
+        todoItem.appendChild(todoDescription);
+        // add abbreviation
+        const todoAbbreviation = document.createElement('p');
+        todoAbbreviation.textContent = `Abkürzung: ${todo.abbreviation}`;
+        todoItem.appendChild(todoAbbreviation);
+        // add priority
+        const priority = calculatePriority(todo);
+        const todoPriority = document.createElement('p');
+        todoPriority.textContent = `Priorität: ${priority}`;
+        todoItem.appendChild(todoPriority);
+        // add end date
+        const endDate = document.createElement('p');
+        endDate.textContent = `Abgeschlossen bis: ${todo.endDate}`;
+        todoItem.appendChild(endDate);
+        // add progress
+        const completedPercentage = calculateCompletedPercentage(todo);
+        const todoProgress = document.createElement('p');
+        todoProgress.textContent = `Fortschritt: ${completedPercentage}%`;
+        todoItem.appendChild(todoProgress);
+        // add progress input
+        const progressLabel = document.createElement('label');
+        progressLabel.setAttribute('for', `progress${index}`);
+        progressLabel.textContent = 'Fortschritt:';
+
+        const progressInput = document.createElement('input');
+        progressInput.setAttribute('type', 'range');
+        progressInput.setAttribute('id', `progress${index}`);
+        progressInput.setAttribute('min', '0');
+        progressInput.setAttribute('max', '100');
+        progressInput.setAttribute('value', completedPercentage);
+        progressInput.addEventListener('input', function () {
+          updateProgress(index, progressInput.value);
+        });
+
+
+        //button to render all TODOs
+        const renderAllButton = document.createElement('button');
+        renderAllButton.textContent = 'Alle anzeigen';
+        renderAllButton.addEventListener('click', function () {
+          renderTodos();
+        });
+        todoItem.appendChild(renderAllButton);
+
+
+        todoList.appendChild(todoItem);
+      });
+    }
+
+    
+
+    // Initial rendering
+    renderTodos();
+
+    // Event listener for submitting the form
+    const todoForm = document.getElementById('todoForm');
+    todoForm.addEventListener('submit', function (event) {
+      event.preventDefault();
+      addTodo();
+    });
+  </script>
   <br><br>
   <!-- Impressum -->
   <div id="impressum">
